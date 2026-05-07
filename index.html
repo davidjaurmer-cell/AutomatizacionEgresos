@@ -1,640 +1,869 @@
+
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
 
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>OCR Inteligente Contable</title>
+<title>OCR Contable PRO</title>
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Tesseract -->
-  <script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
 
-  <style>
+body{
+  background:#f3f4f6;
+}
 
-    body{
-      background:#f3f4f6;
-    }
+.loader{
 
-    .loader{
+  border:6px solid #e5e7eb;
+  border-top:6px solid #16a34a;
 
-      border:6px solid #e5e7eb;
-      border-top:6px solid #16a34a;
+  border-radius:50%;
 
-      border-radius:50%;
+  width:70px;
+  height:70px;
 
-      width:70px;
-      height:70px;
+  animation:spin 1s linear infinite;
+}
 
-      animation:spin 1s linear infinite;
-    }
+@keyframes spin{
 
-    @keyframes spin{
+  100%{
+    transform:rotate(360deg);
+  }
+}
 
-      100%{
+#dropZone.dragover{
+  border-color:#16a34a;
+  background:#dcfce7;
+}
 
-        transform:rotate(360deg);
-      }
-    }
-
-  </style>
+</style>
 
 </head>
 
 <body class="p-8">
 
-  <div class="max-w-6xl mx-auto bg-white rounded-3xl shadow-2xl p-8">
+<div class="max-w-7xl mx-auto bg-white rounded-3xl shadow-2xl p-8">
 
-    <!-- TITULO -->
+  <!-- TITULO -->
 
-    <div class="mb-10">
+  <div class="mb-10">
 
-      <h1 class="text-5xl font-bold text-green-700">
-        Sistema OCR Contable
-      </h1>
+    <h1 class="text-5xl font-bold text-green-700">
+      Sistema OCR Contable PRO
+    </h1>
 
-      <p class="text-gray-600 mt-3 text-lg">
-        Automatización inteligente de comprobantes de egreso
-      </p>
+    <p class="text-gray-600 mt-3 text-lg">
+      Automatización inteligente de comprobantes de egreso
+    </p>
 
-    </div>
+  </div>
 
-    <!-- INPUT -->
+  <!-- DASHBOARD -->
 
-    <div class="bg-gray-50 p-6 rounded-2xl border mb-8">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
 
-      <input
-        type="file"
-        id="imagenInput"
-        accept="image/*"
-        class="w-full border rounded-xl p-4 mb-5 bg-white"
-      />
-
-      <button
-        onclick="procesarDocumento()"
-        class="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-4 rounded-2xl text-lg"
-      >
-        Procesar Documento
-      </button>
-
-    </div>
-
-    <!-- LOADING -->
-
-    <div
-      id="loading"
-      class="hidden text-center mb-10"
-    >
-
-      <div class="loader mx-auto"></div>
-
-      <p class="mt-5 text-lg font-bold text-gray-700">
-        Analizando documento...
-      </p>
-
-    </div>
-
-    <!-- RESULTADOS -->
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-
-      <div class="bg-blue-50 border border-blue-200 p-6 rounded-2xl">
-
-        <h2 class="font-bold text-xl text-blue-800 mb-3">
-          Empresa
-        </h2>
-
-        <p
-          id="empresa"
-          class="text-2xl font-bold text-blue-700"
-        >
-          -
-        </p>
-
-      </div>
-
-      <div class="bg-purple-50 border border-purple-200 p-6 rounded-2xl">
-
-        <h2 class="font-bold text-xl text-purple-800 mb-3">
-          Fecha
-        </h2>
-
-        <p
-          id="fecha"
-          class="text-2xl font-bold text-purple-700"
-        >
-          -
-        </p>
-
-      </div>
-
-      <div class="bg-green-50 border border-green-200 p-6 rounded-2xl">
-
-        <h2 class="font-bold text-xl text-green-800 mb-3">
-          Valor Total
-        </h2>
-
-        <p
-          id="valor"
-          class="text-3xl font-bold text-green-700"
-        >
-          -
-        </p>
-
-      </div>
-
-      <div class="bg-orange-50 border border-orange-200 p-6 rounded-2xl">
-
-        <h2 class="font-bold text-xl text-orange-800 mb-3">
-          NIT
-        </h2>
-
-        <p
-          id="nit"
-          class="text-2xl font-bold text-orange-700"
-        >
-          -
-        </p>
-
-      </div>
-
-    </div>
-
-    <!-- TEXTO OCR -->
-
-    <div>
-
-      <h2 class="text-3xl font-bold mb-5">
-        Texto Detectado
+    <div class="bg-green-50 border border-green-200 rounded-2xl p-6">
+      <h2 class="text-lg font-bold text-green-800 mb-2">
+        Total Procesado
       </h2>
 
-      <textarea
-        id="textoOCR"
-        class="w-full h-[450px] border rounded-2xl p-5 text-sm"
-      ></textarea>
+      <p id="totalProcesado" class="text-4xl font-bold text-green-700">
+        $0
+      </p>
+    </div>
 
+    <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6">
+      <h2 class="text-lg font-bold text-blue-800 mb-2">
+        Comprobantes
+      </h2>
+
+      <p id="cantidadComprobantes" class="text-4xl font-bold text-blue-700">
+        0
+      </p>
+    </div>
+
+    <div class="bg-purple-50 border border-purple-200 rounded-2xl p-6">
+      <h2 class="text-lg font-bold text-purple-800 mb-2">
+        Promedio
+      </h2>
+
+      <p id="promedioProcesado" class="text-4xl font-bold text-purple-700">
+        $0
+      </p>
     </div>
 
   </div>
 
-  <script>
+  <!-- DRAG DROP -->
 
-    async function procesarDocumento(){
+  <div
+    id="dropZone"
+    class="border-4 border-dashed border-gray-300 rounded-3xl p-10 text-center mb-8 transition-all"
+  >
 
-      try{
+    <p class="text-2xl font-bold text-gray-700 mb-3">
+      Arrastra aquí el comprobante
+    </p>
 
-        // ======================================
-        // LOADING
-        // ======================================
+    <p class="text-gray-500 mb-5">
+      o selecciona una imagen
+    </p>
 
-        document
-        .getElementById("loading")
-        .classList
-        .remove("hidden");
+    <input
+      type="file"
+      id="imagenInput"
+      accept="image/*"
+      class="w-full border rounded-xl p-4 mb-5 bg-white"
+    />
 
-        // ======================================
-        // ARCHIVO
-        // ======================================
+    <button
+      onclick="procesarDocumento()"
+      class="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-4 rounded-2xl text-lg"
+    >
+      Procesar Documento
+    </button>
 
-        const archivo =
-        document
-        .getElementById("imagenInput")
-        .files[0];
+    <button
+      onclick="exportarExcel()"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-2xl text-lg ml-3"
+    >
+      Exportar Excel
+    </button>
 
-        if(!archivo){
+  </div>
 
-          alert(
-            "Selecciona una imagen"
-          );
+  <!-- LOADING -->
 
-          return;
-        }
+  <div id="loading" class="hidden text-center mb-10">
 
-        // ======================================
-        // CARGAR IMAGEN
-        // ======================================
+    <div class="loader mx-auto"></div>
 
-        const imageURL =
-        URL.createObjectURL(archivo);
+    <p class="mt-5 text-lg font-bold text-gray-700">
+      Analizando documento...
+    </p>
 
-        const img =
-        new Image();
+  </div>
 
-        img.src = imageURL;
+  <!-- RESULTADOS -->
 
-        await new Promise(resolve => {
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
 
-          img.onload = resolve;
-        });
+    <div class="bg-blue-50 border border-blue-200 p-6 rounded-2xl">
+      <h2 class="font-bold text-xl text-blue-800 mb-3">
+        Empresa
+      </h2>
 
-        // ======================================
-        // CANVAS
-        // ======================================
+      <p id="empresa" class="text-2xl font-bold text-blue-700">-</p>
+    </div>
 
-        const canvas =
-        document.createElement("canvas");
+    <div class="bg-purple-50 border border-purple-200 p-6 rounded-2xl">
+      <h2 class="font-bold text-xl text-purple-800 mb-3">
+        Fecha
+      </h2>
 
-        const ctx =
-        canvas.getContext("2d");
+      <p id="fecha" class="text-2xl font-bold text-purple-700">-</p>
+    </div>
 
-        // ESCALA X2
-        canvas.width =
-        img.width * 2;
+    <div class="bg-green-50 border border-green-200 p-6 rounded-2xl">
+      <h2 class="font-bold text-xl text-green-800 mb-3">
+        Valor Total
+      </h2>
 
-        canvas.height =
-        img.height * 2;
+      <p id="valor" class="text-3xl font-bold text-green-700">-</p>
+    </div>
 
-        ctx.drawImage(
+    <div class="bg-orange-50 border border-orange-200 p-6 rounded-2xl">
+      <h2 class="font-bold text-xl text-orange-800 mb-3">
+        NIT
+      </h2>
 
-          img,
+      <p id="nit" class="text-2xl font-bold text-orange-700">-</p>
+    </div>
 
-          0,
-          0,
+  </div>
 
-          canvas.width,
-          canvas.height
-        );
+  <!-- VALIDACION -->
 
-        // ======================================
-        // PREPROCESAMIENTO
-        // ======================================
+  <div
+    id="validacion"
+    class="hidden mb-10 p-6 rounded-2xl border text-xl font-bold"
+  ></div>
 
-        const imageData =
-        ctx.getImageData(
+  <!-- BUSCADOR -->
 
-          0,
-          0,
+  <div class="mb-5">
 
-          canvas.width,
-          canvas.height
-        );
+    <input
+      type="text"
+      id="buscador"
+      placeholder="Buscar comprobante..."
+      class="w-full border rounded-2xl p-4"
+      onkeyup="filtrarTabla()"
+    />
 
-        const data =
-        imageData.data;
+  </div>
 
-        for(
+  <!-- TABLA -->
 
-          let i = 0;
+  <div class="mb-10 overflow-auto">
 
-          i < data.length;
+    <table class="w-full border border-gray-300">
 
-          i += 4
-        ){
+      <thead class="bg-gray-200">
 
-          // ESCALA DE GRISES
-          const gris =
+        <tr>
+          <th class="border p-3">Empresa</th>
+          <th class="border p-3">Fecha</th>
+          <th class="border p-3">Valor</th>
+          <th class="border p-3">NIT</th>
+          <th class="border p-3">Acciones</th>
+        </tr>
 
-          (
-            data[i]
-            +
-            data[i+1]
-            +
-            data[i+2]
-          ) / 3;
+      </thead>
 
-          // CONTRASTE FUERTE
-          const valor =
-          gris > 150 ? 255 : 0;
+      <tbody id="tablaComprobantes"></tbody>
 
-          data[i] = valor;
-          data[i+1] = valor;
-          data[i+2] = valor;
-        }
+    </table>
 
-        ctx.putImageData(
-          imageData,
-          0,
-          0
-        );
+  </div>
 
-        // ======================================
-        // OCR
-        // ======================================
+  <!-- GRAFICA -->
 
-        const resultado =
-        await Tesseract.recognize(
+  <div class="bg-gray-50 border rounded-3xl p-8 mb-10">
 
-          canvas,
+    <h2 class="text-3xl font-bold mb-6">
+      Gráfico de Egresos
+    </h2>
 
-          "spa",
+    <canvas id="grafica"></canvas>
 
-          {
+  </div>
 
-            logger: m => {
+  <!-- TEXTO OCR -->
 
-              console.log(m);
-            }
-          }
-        );
+  <div>
 
-        const texto =
-        resultado.data.text;
+    <h2 class="text-3xl font-bold mb-5">
+      Texto Detectado
+    </h2>
 
-        // ======================================
-        // MOSTRAR OCR
-        // ======================================
+    <textarea
+      id="textoOCR"
+      class="w-full h-[450px] border rounded-2xl p-5 text-sm"
+    ></textarea>
 
-        document
-        .getElementById("textoOCR")
-        .value = texto;
+  </div>
 
-        // ======================================
-        // LIMPIEZA
-        // ======================================
+</div>
 
-        const textoLimpio =
+<script>
 
-        texto
-        .replace(/\n/g," ")
-        .replace(/\s+/g," ")
-        .trim();
+let comprobantes = [];
+let chart;
 
-        // ======================================
-        // LINEAS
-        // ======================================
+window.onload = () => {
 
-        const lineas =
-        texto.split("\n");
+  const guardados =
+  localStorage.getItem(
+    "comprobantes"
+  );
 
-        // ======================================
-        // FECHA
-        // ======================================
+  if(guardados){
 
-        let fechaFinal =
-        "No detectada";
+    comprobantes =
+    JSON.parse(guardados);
 
-        const regexFecha =
+    renderTabla();
+    actualizarDashboard();
+    actualizarGrafica();
+  }
+};
 
-        /\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/;
+// DRAG DROP
 
-        const fecha =
-        textoLimpio.match(regexFecha);
+const dropZone =
+document.getElementById("dropZone");
 
-        if(fecha){
+dropZone.addEventListener("dragover", e => {
 
-          fechaFinal =
-          fecha[0];
-        }
+  e.preventDefault();
 
-        // ======================================
-        // NIT
-        // ======================================
+  dropZone.classList.add("dragover");
+});
 
-        let nitFinal =
-        "No detectado";
+dropZone.addEventListener("dragleave", () => {
 
-        const regexNit =
+  dropZone.classList.remove("dragover");
+});
 
-        /\d{3}\.?\d{3}\.?\d{3}/;
+dropZone.addEventListener("drop", e => {
 
-        const nit =
-        textoLimpio.match(regexNit);
+  e.preventDefault();
 
-        if(nit){
+  dropZone.classList.remove("dragover");
 
-          nitFinal =
-          nit[0];
-        }
+  const files = e.dataTransfer.files;
 
-        // ======================================
-        // EMPRESA
-        // ======================================
+  document.getElementById("imagenInput").files = files;
+});
 
-        let empresaFinal =
-        "No detectada";
+async function procesarDocumento(){
 
-        for(let linea of lineas){
+  try{
 
-          linea =
-          linea.trim();
+    document
+    .getElementById("loading")
+    .classList
+    .remove("hidden");
 
-          if(
+    const archivo =
+    document
+    .getElementById("imagenInput")
+    .files[0];
 
-            linea.length > 5
+    if(!archivo){
 
-            &&
+      alert("Selecciona una imagen");
+      return;
+    }
 
-            linea === linea.toUpperCase()
+    const imageURL =
+    URL.createObjectURL(archivo);
 
-            &&
+    const img =
+    new Image();
 
-            !linea.includes("NIT")
+    img.src = imageURL;
 
-            &&
+    await new Promise(resolve => {
+      img.onload = resolve;
+    });
 
-            !linea.includes("COMPROBANTE")
+    const canvas =
+    document.createElement("canvas");
 
-            &&
+    const ctx =
+    canvas.getContext("2d");
 
-            !linea.includes("FECHA")
+    canvas.width = img.width * 2;
+    canvas.height = img.height * 2;
 
-            &&
+    ctx.drawImage(
+      img,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
 
-            !linea.includes("VALOR")
-          ){
+    const resultado =
+    await Tesseract.recognize(
+      canvas,
+      "spa"
+    );
 
-            empresaFinal =
-            linea;
+    const texto =
+    resultado.data.text;
 
-            break;
-          }
-        }
+    document
+    .getElementById("textoOCR")
+    .value = texto;
 
-        // ======================================
-        // VALOR INTELIGENTE
-        // ======================================
+    const textoLimpio =
+    texto
+    .replace(/\n/g," ")
+    .replace(/\s+/g," ")
+    .trim();
 
-        let valorFinal = 0;
+    const lineas =
+    texto.split("\n");
 
-        // PRIORIDADES
-        const prioridades = [
+    // FECHA
 
-          "TOTAL COMPROBANTE",
-          "VALOR TOTAL",
-          "TOTAL PAGADO",
-          "TOTAL",
-          "VALOR",
-          "POR VALOR",
-          "PÁGUESE A",
-          "PAGUESE A"
-        ];
+    let fechaFinal =
+    "No detectada";
 
-        // ======================================
-        // BUSCAR POR PRIORIDAD
-        // ======================================
+    const fecha =
+    textoLimpio.match(
+      /\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/
+    );
 
-        for(let prioridad of prioridades){
+    if(fecha){
+      fechaFinal = fecha[0];
+    }
 
-          for(let linea of lineas){
+    // NIT
 
-            const lineaMayus =
+    let nitFinal =
+    "No detectado";
 
-            linea.toUpperCase();
+    const nit =
+    textoLimpio.match(
+      /\d{3}\.?\d{3}\.?\d{3}/
+    );
 
-            if(
+    if(nit){
+      nitFinal = nit[0];
+    }
 
-              lineaMayus.includes(prioridad)
-            ){
+    // EMPRESA
 
-              // EXTRAER NUMEROS
-              const encontrados =
+    let empresaFinal =
+    "No detectada";
 
-              linea.match(
+    for(let linea of lineas){
 
-                /\d{1,3}(?:[\.\,]\d{3})+/g
-              );
+      linea = linea.trim();
 
-              if(encontrados){
+      if(
+        linea.length > 5
+        &&
+        linea === linea.toUpperCase()
+        &&
+        !linea.includes("NIT")
+        &&
+        !linea.includes("COMPROBANTE")
+      ){
 
-                const numeros =
-
-                encontrados.map(n => {
-
-                  return parseInt(
-
-                    n
-                    .replace(/\./g,"")
-                    .replace(/\,/g,"")
-                  );
-                });
-
-                // TOMAR MAYOR
-                const mayor =
-                Math.max(...numeros);
-
-                if(mayor > valorFinal){
-
-                  valorFinal = mayor;
-                }
-              }
-            }
-          }
-
-          // SI YA ENCONTRO
-          if(valorFinal > 0){
-
-            break;
-          }
-        }
-
-        // ======================================
-        // RESPALDO
-        // ======================================
-
-        if(valorFinal === 0){
-
-          const numeros =
-
-          textoLimpio.match(
-
-            /\d{1,3}(?:[\.\,]\d{3})+/g
-          );
-
-          if(numeros){
-
-            const convertidos =
-
-            numeros.map(n => {
-
-              return parseInt(
-
-                n
-                .replace(/\./g,"")
-                .replace(/\,/g,"")
-              );
-            });
-
-            // FILTRAR VALORES PEQUEÑOS
-            const grandes =
-
-            convertidos.filter(
-
-              n => n > 10000
-            );
-
-            if(grandes.length > 0){
-
-              valorFinal =
-              Math.max(...grandes);
-            }
-          }
-        }
-
-        // ======================================
-        // VALIDACION EXTRA
-        // ======================================
-
-        if(valorFinal > 999999999){
-
-          valorFinal = 0;
-        }
-
-        // ======================================
-        // MOSTRAR RESULTADOS
-        // ======================================
-
-        document
-        .getElementById("empresa")
-        .innerText =
-        empresaFinal;
-
-        document
-        .getElementById("fecha")
-        .innerText =
-        fechaFinal;
-
-        document
-        .getElementById("nit")
-        .innerText =
-        nitFinal;
-
-        document
-        .getElementById("valor")
-        .innerText =
-
-        valorFinal > 0
-
-        ?
-
-        "$ " +
-
-        valorFinal.toLocaleString(
-          "es-CO"
-        )
-
-        :
-
-        "No detectado";
-
-        // ======================================
-        // FINALIZAR
-        // ======================================
-
-        document
-        .getElementById("loading")
-        .classList
-        .add("hidden");
-
-      }catch(error){
-
-        console.log(error);
-
-        alert(
-          "Error al procesar documento"
-        );
-
-        document
-        .getElementById("loading")
-        .classList
-        .add("hidden");
+        empresaFinal = linea;
+        break;
       }
     }
 
-  </script>
+    // VALOR
+
+    let valorFinal = 0;
+
+// PRIORIDADES
+const prioridades = [
+
+  "TOTAL COMPROBANTE",
+  "VALOR TOTAL",
+  "TOTAL PAGADO",
+  "TOTAL",
+  "VALOR",
+  "POR VALOR",
+  "PÁGUESE A",
+  "PAGUESE A"
+];
+
+// PALABRAS A IGNORAR
+const ignorar = [
+
+  "NIT",
+  "TEL",
+  "TELEFONO",
+  "CHEQUE",
+  "CODIGO"
+];
+
+// ======================================
+// BUSQUEDA POR LINEAS
+// ======================================
+
+for(let linea of lineas){
+
+  const lineaMayus =
+  linea.toUpperCase();
+
+  // IGNORAR LINEAS
+  let invalida = false;
+
+  for(let palabra of ignorar){
+
+    if(lineaMayus.includes(palabra)){
+
+      invalida = true;
+      break;
+    }
+  }
+
+  if(invalida){
+    continue;
+  }
+
+  // BUSCAR PRIORIDADES
+  for(let prioridad of prioridades){
+
+    if(lineaMayus.includes(prioridad)){
+
+      const encontrados =
+
+      linea.match(
+        /\d{1,3}(?:[\.\,]\d{3})+/g
+      );
+
+      if(encontrados){
+
+        const numeros =
+
+        encontrados.map(n => {
+
+          return parseInt(
+
+            n
+            .replace(/\./g,"")
+            .replace(/\,/g,"")
+          );
+        });
+
+        // TOMAR EL MAYOR
+        const mayor =
+        Math.max(...numeros);
+
+        if(mayor > valorFinal){
+
+          valorFinal = mayor;
+        }
+      }
+    }
+  }
+}
+
+// ======================================
+// RESPALDO
+// ======================================
+
+if(valorFinal === 0){
+
+  const numeros =
+
+  textoLimpio.match(
+
+    /\d{1,3}(?:[\.\,]\d{3})+/g
+  );
+
+  if(numeros){
+
+    const convertidos =
+
+    numeros.map(n => {
+
+      return parseInt(
+
+        n
+        .replace(/\./g,"")
+        .replace(/\,/g,"")
+      );
+    });
+
+    // FILTRAR
+    const grandes =
+
+    convertidos.filter(
+
+      n =>
+      n > 10000
+      &&
+      n < 100000000
+    );
+
+    if(grandes.length > 0){
+
+      valorFinal =
+      Math.max(...grandes);
+    }
+  }
+}
+
+    // VALIDACION
+
+    const creditos = [];
+    const debitos = [];
+
+    lineas.forEach(linea => {
+
+      if(linea.includes("$")){
+
+        const nums = linea.match(/\d{1,3}(?:\.\d{3})+/g);
+
+        if(nums){
+
+          nums.forEach(n => {
+
+            const valor = parseInt(
+              n.replace(/\./g,"")
+            );
+
+            if(linea.toLowerCase().includes("credito")){
+              creditos.push(valor);
+            }
+
+            if(linea.toLowerCase().includes("debito")){
+              debitos.push(valor);
+            }
+          });
+        }
+      }
+    });
+
+    const sumaCreditos =
+    creditos.reduce((a,b)=>a+b,0);
+
+    const sumaDebitos =
+    debitos.reduce((a,b)=>a+b,0);
+
+    const validacion =
+    document.getElementById("validacion");
+
+    if(
+      sumaCreditos > 0
+      ||
+      sumaDebitos > 0
+    ){
+
+      validacion.classList.remove("hidden");
+
+      if(sumaCreditos === sumaDebitos){
+
+        validacion.className =
+        "mb-10 p-6 rounded-2xl border text-xl font-bold bg-green-50 border-green-200 text-green-700";
+
+        validacion.innerHTML =
+        "✅ El comprobante cuadra correctamente";
+      }
+      else{
+
+        validacion.className =
+        "mb-10 p-6 rounded-2xl border text-xl font-bold bg-red-50 border-red-200 text-red-700";
+
+        validacion.innerHTML =
+        "⚠ Débito y Crédito no coinciden";
+      }
+    }
+
+    // MOSTRAR
+
+    document.getElementById("empresa").innerText = empresaFinal;
+    document.getElementById("fecha").innerText = fechaFinal;
+    document.getElementById("nit").innerText = nitFinal;
+
+    document.getElementById("valor").innerText =
+    "$ " + valorFinal.toLocaleString("es-CO");
+
+    // GUARDAR
+
+    comprobantes.push({
+
+      empresa: empresaFinal,
+      fecha: fechaFinal,
+      valor: valorFinal,
+      nit: nitFinal
+    });
+
+    localStorage.setItem(
+      "comprobantes",
+      JSON.stringify(comprobantes)
+    );
+
+    renderTabla();
+    actualizarDashboard();
+    actualizarGrafica();
+
+    document
+    .getElementById("loading")
+    .classList
+    .add("hidden");
+
+  }catch(error){
+
+    console.log(error);
+
+    alert(
+      "Error al procesar documento"
+    );
+
+    document
+    .getElementById("loading")
+    .classList
+    .add("hidden");
+  }
+}
+
+function renderTabla(lista = comprobantes){
+
+  const tbody =
+  document.getElementById(
+    "tablaComprobantes"
+  );
+
+  tbody.innerHTML = "";
+
+  lista.forEach((c,index) => {
+
+    tbody.innerHTML += `
+
+      <tr>
+
+        <td class="border p-3">
+          ${c.empresa}
+        </td>
+
+        <td class="border p-3">
+          ${c.fecha}
+        </td>
+
+        <td class="border p-3">
+          $ ${Number(c.valor).toLocaleString("es-CO")}
+        </td>
+
+        <td class="border p-3">
+          ${c.nit}
+        </td>
+
+        <td class="border p-3 text-center">
+
+          <button
+            onclick="eliminarRegistro(${index})"
+            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl"
+          >
+            Eliminar
+          </button>
+
+        </td>
+
+      </tr>
+    `;
+  });
+}
+
+function eliminarRegistro(index){
+
+  comprobantes.splice(index,1);
+
+  localStorage.setItem(
+    "comprobantes",
+    JSON.stringify(comprobantes)
+  );
+
+  renderTabla();
+  actualizarDashboard();
+  actualizarGrafica();
+}
+
+function actualizarDashboard(){
+
+  const total = comprobantes.reduce((a,b)=>a + Number(b.valor),0);
+
+  const promedio =
+  comprobantes.length > 0
+  ? total / comprobantes.length
+  : 0;
+
+  document.getElementById("totalProcesado").innerText =
+  "$ " + total.toLocaleString("es-CO");
+
+  document.getElementById("cantidadComprobantes").innerText =
+  comprobantes.length;
+
+  document.getElementById("promedioProcesado").innerText =
+  "$ " + Math.round(promedio).toLocaleString("es-CO");
+}
+
+function filtrarTabla(){
+
+  const texto =
+  document.getElementById("buscador")
+  .value
+  .toLowerCase();
+
+  const filtrados =
+  comprobantes.filter(c => {
+
+    return (
+      c.empresa.toLowerCase().includes(texto)
+      ||
+      c.fecha.toLowerCase().includes(texto)
+      ||
+      c.nit.toLowerCase().includes(texto)
+    );
+  });
+
+  renderTabla(filtrados);
+}
+
+function exportarExcel(){
+
+  if(comprobantes.length === 0){
+
+    alert("No hay comprobantes");
+    return;
+  }
+
+  const datos = comprobantes.map(c => ({
+
+    Empresa: c.empresa,
+    Fecha: c.fecha,
+    Valor: c.valor,
+    NIT: c.nit
+  }));
+
+  const hoja = XLSX.utils.json_to_sheet(datos);
+
+  hoja["!cols"] = [
+
+    { wch: 40 },
+    { wch: 20 },
+    { wch: 20 },
+    { wch: 25 }
+  ];
+
+  const libro = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(
+    libro,
+    hoja,
+    "Comprobantes"
+  );
+
+  XLSX.writeFile(
+    libro,
+    "comprobantes.xlsx"
+  );
+}
+
+function actualizarGrafica(){
+
+  const ctx =
+  document.getElementById("grafica");
+
+  const labels = comprobantes.map((c,i) =>
+    "Comp " + (i+1)
+  );
+
+  const valores = comprobantes.map(c => c.valor);
+
+  if(chart){
+    chart.destroy();
+  }
+
+  chart = new Chart(ctx,{
+
+    type:"bar",
+
+    data:{
+
+      labels,
+
+      datasets:[{
+
+        label:"Valor",
+        data:valores
+      }]
+    }
+  });
+}
+
+</script>
 
 </body>
 </html>
+```
