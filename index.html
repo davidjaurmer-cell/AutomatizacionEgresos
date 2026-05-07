@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>OCR Contable PRO</title>
+<title>Sistema de automatizacion de egresos</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -16,7 +16,7 @@
 <style>
 
 body{
-  background:#f3f4f6;
+  background:#7f848d;
 }
 
 .loader{
@@ -57,12 +57,14 @@ body{
   <div class="mb-10">
 
     <h1 class="text-5xl font-bold text-green-700">
-      Sistema OCR Contable PRO
+      Sistema de automatizacion de egresos
     </h1>
 
     <p class="text-gray-600 mt-3 text-lg">
-      Automatización inteligente de comprobantes de egreso
+      Sistema inteligente de automatizacion a apartir del reconocmiento de caracteres opticos (imagenes)
     </p>
+
+    
 
   </div>
 
@@ -129,13 +131,6 @@ body{
       class="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-4 rounded-2xl text-lg"
     >
       Procesar Documento
-    </button>
-
-    <button
-      onclick="exportarExcel()"
-      class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-2xl text-lg ml-3"
-    >
-      Exportar Excel
     </button>
 
   </div>
@@ -246,7 +241,14 @@ body{
     <canvas id="grafica"></canvas>
 
   </div>
-
+  <div class="text-center"><button
+      onclick="exportarExcel()"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-2xl text-lg ml-3"
+    >
+      Exportar Excel
+    </button>
+  </div>
+  
   <!-- TEXTO OCR -->
 
   <div>
@@ -261,6 +263,7 @@ body{
     ></textarea>
 
   </div>
+  
 
 </div>
 
