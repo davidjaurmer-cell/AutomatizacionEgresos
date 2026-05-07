@@ -1,6 +1,4 @@
 # AutomatizacionEgresos
 El siguiente proyecto tiene como finalidad automatizar el registro de egresos mediante el reconocimiento optico de caracteres.
 
-Dependencias:
-npm init -y
-npm install express cors openai
+Como solución a un cuello de botellla identificado como el proceso manual de el registro de facturacion de egresos en una empresa, el software a continuacion hace la funcion de automatizar el proceso mediante elreconocimiento optico de caracteres con la herramienta tesseract. despues de reconocido el archivo se estran datos como el nombre de la empresa,el nit, fecha de facturacion y valor total. Los datos almacenados se pueden visualizar en un grafico de barras comparando los diversos archivos ingresados por el usuario y por ultimo tenemos la opcion de borrar los registros o de exportar un archivo .xlsx (excel) para visualizar los datos recolectados en una tabla de excel con filas y columnas debidamente organizadas.
