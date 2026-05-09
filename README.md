@@ -3,5 +3,5 @@ El siguiente proyecto tiene como finalidad automatizar el registro de egresos me
 
 Como solución a un cuello de botellla identificado como el proceso manual de el registro de facturacion de egresos en una empresa, el software a continuacion hace la funcion de automatizar el proceso mediante elreconocimiento optico de caracteres con la herramienta tesseract. despues de reconocido el archivo se estran datos como el nombre de la empresa,el nit, fecha de facturacion y valor total. Los datos almacenados se pueden visualizar en un grafico de barras comparando los diversos archivos ingresados por el usuario y por ultimo tenemos la opcion de borrar los registros o de exportar un archivo .xlsx (excel) para visualizar los datos recolectados en una tabla de excel con filas y columnas debidamente organizadas.
 
-##¿Cómo ejecutar el programa?
+## ¿Cómo ejecutar el programa?
 Es muy facil, teniendo en cuenta de que estamos manejando un servidor local lo que debes ahcer es crear un espacio de trabajo de este repositorio de en el mismo github (codespace) y despues de creado instalas la extension de Live server. Despues de instalado das click derecho dentro del archivo index.html y buscas la opcion de "Open with live server" que debe salir cuando oprimiste click derecho. Despues de abierto ya tendrás a tu disposicion el proyecto.
